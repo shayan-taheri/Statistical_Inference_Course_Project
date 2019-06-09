@@ -1,0 +1,103 @@
+---
+title: Investigation of the Exponential Distribution in R and its Comparison with
+  the Central Limit Theorem
+author: "Shayan (Sean) Taheri"
+date: "June 08, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Overview
+
+In this data analysis project, the goal is investigating the exponential distribution and
+compare it to the Central Limit Theorem. Through this analysis, the lambda will be set to 0.2
+for all the simulation. This investigation will compare compare the distribution of aversages
+of 40 exponential over 1000 simulation.
+
+## Simulations
+
+Set the simulation variables for simulation: lambda, exponentials, and seed.
+
+```{r}
+ECHO=TRUE
+set.seed(1337)
+lambda = 0.2
+exponentials = 40
+```
+
+Let's run the simulations with the variables.
+
+```{r}
+simMeans = NULL
+for (i in 1 : 1000) simMeans = c(simMeans, mean(rexp(exponentials, lambda)))
+```
+
+
+## Sample Mean versus Theoretical Mean
+
+#### Sample Mean
+
+Calculation of the mean from the simualtions with the given sample mean value.
+
+```{r}
+mean(simMeans)
+```
+
+#### Theoretical Mean
+
+We define the theoretical mean of an exponential distribution as lambda to the power of -1.
+```{r}
+lambda^-1
+```
+
+#### Comparison
+
+We have only a small difference between the sample mean from simulations and the theoretical mean from the exponential distribution.
+
+```{r}
+abs(mean(simMeans)-lambda^-1)
+```
+
+
+## Sample Variance versus Theoretical Variance
+
+#### Sample Variance
+
+Calculation of the variance from the simulation means and the given sample variance.
+
+```{r}
+var(simMeans)
+```
+
+#### Theoretical Variance
+
+We can define the theoretical variance  of an exponential distribution as multiplication of lambda and the squared-root of "n", all to the power of -2.
+```{r}
+(lambda * sqrt(exponentials))^-2
+```
+
+#### Comparison
+
+We have a small difference between the simulations sample variance and the theoretical variance from the exponential distribution.
+```{r}
+abs(var(simMeans)-(lambda * sqrt(exponentials))^-2)
+```
+
+
+## Distribution
+
+A density histogram of 1000 simulations. We have an overlay with a normal ditribution with a mean of lambda to the power of -1.
+
+The standard deviation is defined as multiplication of lamda and the squared-root of "n" to the power of -1. This is the theoretical normal distribution for the simulations.
+
+```{r}
+library(ggplot2)
+ggplot(data.frame(y=simMeans), aes(x=y)) + 
+  geom_histogram(aes(y=..density..), binwidth=0.2, fill="#0072B2", 
+                 color="black") +
+  stat_function(fun=dnorm, arg=list(mean=lambda^-1, 
+                                    sd=(lambda*sqrt(exponentials))^-1), 
+                size=2) +
+  labs(title="Plot of the Simulations", x="Simulation Mean")
+```
